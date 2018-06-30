@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "965509035052",
+    "firebase_url": "https://bill-it-29c08.firebaseio.com",
+    "project_id": "bill-it-29c08",
+    "storage_bucket": "bill-it-29c08.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:965509035052:android:0e55fd411957f933",
+        "android_client_info": {
+          "package_name": "e.tibod.ticketscannerv2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "965509035052-v71m8gj1ds3igmneb5ncd1j5o8emfncg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHiimRgjcYJKpmIPtn_lgq5fOXyYFon14"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
