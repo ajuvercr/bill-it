@@ -1,0 +1,137 @@
+<resources>
+    <string name="app_name" translatable="false">Bill-It</string>
+    <string name="ok" translatable="false">OK</string>
+
+    <!-- Google part (image capture) strings -->
+    <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
+    <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
+    <string name="low_storage_error">Ocr dependencies cannot be downloaded due to low device storage</string>
+
+    <string name="title_activity_main">Bill-It</string>
+    <string name="title_add_friend">Add friend</string>
+    <string name="title_edit_friend">Edit friend</string>
+    <string name="title_add_group">Add Group</string>
+    <string name="title_edit_group">Edit Group</string>
+    <string name="title_ocr_activity">Add scan for: </string>
+
+    <string name="ocr_header">Click &quot;Detect Text&quot; to detect text</string>
+    <string name="read_text">Detect Text</string>
+    <string name="auto_focus">Auto Focus</string>
+    <string name="use_flash">Use Flash</string>
+    <string name="ocr_success">Text read successfully</string>
+    <string name="ocr_failure">No text captured</string>
+    <string name="ocr_error">"Error reading text: %1$s"</string>
+    <string name="image">image</string>
+
+    <string name="save_edit">Confirm</string>
+    <string name="confirm_edit">Confirm</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="avatar_description">Avatar of a Friend</string>
+    <string name="flash" translatable="false">Flash</string>
+
+    <!-- ItemActivity Strings -->
+    <string name="im_act_message">Swipe left or right to remove items</string>
+    <string name="item_delete">Item deleted</string>
+    <string name="done">Done</string>
+    <string name="quantity">Quantity</string>
+    <string name="description">Description</string>
+    <string name="unit_price">Unit price</string>
+    <string name="total_price">Total price</string>
+
+    <!-- OverViewActivity Strings -->
+    <string name="send">Send to all</string>
+
+
+    <!-- Tutorial dialog strings -->
+    <string name="no_reminder">Do not remind me again</string>
+
+    <string name="CROPTUTORIAL" translatable="false">crop_tutorial</string>
+    <string name="crop_message">Crop the image so only the items \nand their price remain \n(don\'t include the total price)</string>
+
+    <string name="CAPTURETUTORIAL" translatable="false">capture_tutorial</string>
+    <string name="capture_message">To ensure the desired text is recognised, please wait until boxes appear
+            around the text. It is possible that the autofocus isn\'t working properly. If this occurs
+            try moving the camera away from the ticket and slowly come closer again. If this doesn\'t work
+            either try rotating your device (to landscape mode).</string>
+
+    <!-- Settings strings -->
+    <string name="settings_key" translatable="false">settings_key</string>
+    <string name="settings">Settings</string>
+
+    <string name="user">User info</string>
+    <string name="user_name">Display name</string>
+    <string name="email">E-mail address</string>
+    <string name="user_id" translatable="false">user_id</string>
+
+    <string name="tutorials">Tutorials</string>
+
+    <string name="crop_tutorial_title">Image cropping</string>
+    <string name="capture_tutorial_title">Image capturing</string>
+    <string name="welcome_tutotial_title">Welcome</string>
+
+    <string name="settings_error">You can not go back until you fix the following errors:</string>
+    <string name="settings_error_detail">There were the following errors in %1$s:</string>
+
+    <!-- Main activity string -->
+    <string name="WELCOMETUTORIAL" translatable="false">welcome_tutorial</string>
+    <string name="welcome_message">Welcome to Bill-It! If this is your first time, you might be
+            seeing tutorial windows like this pop up. You can disable them by clicking the checkbox.
+            If you would like to re-enable them later, you can do so in the settings.</string>
+    <string name="consumer">Consumer</string>
+    <string name="buyer">Buyer</string>
+    <string name="item">Item</string>
+
+    <!-- Log in activity -->
+    <string name="first">Log in/Sign up</string>
+    <string name="fill_in">Please fill in the following to start using the app</string>
+    <string name="name_length_error">Name must be at least 2 characters long</string>
+    <string name="name_invalid">Name can only consist of letters, spaces and hyphens</string>
+    <string name="email_invalid">Please enter a valid E-mail address</string>
+    <string name="password">Password</string>
+    <string name="conf_password">Confirm password</string>
+    <string name="pass_length">Password must be at least 8 characters long</string>
+    <string name="pass_no_match">Passwords must match</string>
+
+    <string name="add_members">Add Members</string>
+
+    <!-- Add friend -->
+    <string name="local_user">Local user</string>
+    <string name="online_user">Online user</string>
+    <string name="difference"><u>What\'s the difference?</u></string>
+    <string name="add_instruction">To add an online friend, fill in your friend\'s ID in the field below</string>
+    <string name="clip_copy">Copy to clipboard</string>
+    <string name="your_id">Your id: </string>
+    <string name="friends_explanation">A local friend is a friend that only exists for your app.
+    They are stored locally (but also backed up to the server) and do not require internet access to add.
+    \n\nAn online friend is a friend who has an account of their own. When you add an online friend
+    to one of your groups, they will be able to track debts through the app the same way you do.</string>
+    <string name="remove_from_group_error">Only the group owner can remove other people</string>
+    <string name="friend_added">Friend added</string>
+    <string name="friends">Friends</string>
+    <string name="groups">Groups</string>
+    <string name="add_friend">Add Friend</string>
+    <string name="add_group">Add Group</string>
+    <string name="ocr_capture">Camera</string>
+    <string name="log_out">Log Out</string>
+    <string name="add_item">Add Item</string>
+    <string name="price">price</string>
+    <string name="item_name">Item Name</string>
+    <string name="swipe_instructions">Swipe up to split, swipe down to delete</string>
+    <string name="edit_item">Edit item</string>
+    <string name="price_invalid">There seems to be something wrong with the price</string>
+    <string name="cancel">Cancel</string>
+    <string name="title_crop_activity">Crop</string>
+    <string name="title_image_activity">Edit Items</string>
+    <string name="title_split_activity">Split Items</string>
+    <string name="split_tutorial" translatable="false">split_tutorial</string>
+    <string name="split_tutorial_title">Item splitting</string>
+    <string name="split_tutorial_message">Swipe the middle item up to split it between the buyer and consume. The buyer will gain credits and the consumer will lose credits.Align the buyer and consumer with the item to select them. Swipe any item downto delete it. Long press an item to edit it. Changes (splits, deletes and edits will only be saved when done is pressed.</string>
+    <string name="group_tutorial" translatable="false">group_tutorial</string>
+    <string name="group_tutorial_title">Group overview</string>
+    <string name="group_tutorial_message">Edit group name, add new group members, send an overview to group members, remove members by swiping left or right, manually add items, scan items or split them.</string>
+    <plurals name="divide_items">
+        <item quantity="one">Divide %d item</item>
+        <item quantity="other">Divide %d items</item>
+    </plurals>
+</resources>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="seacoalCo.bill_it">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!--restrict visibility on Google Play to devices that have a camera-->
+    <uses-feature android:name="android.hardware.camera"
+        android:required="true" />
+
+    <meta-data
+        android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+        android:value="text" />
+
+    <application
+        android:allowBackup="true"
+        android:hardwareAccelerated="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity android:name="seacoalCo.bill_it.LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="seacoalCo.bill_it.MainDrawerActivity"
+            android:label="@string/app_name" />
+
+        <activity
+            android:name="seacoalCo.bill_it.friends.EditFriend"
+            android:parentActivityName="seacoalCo.bill_it.MainDrawerActivity"
+            android:label="@string/title_edit_friend" />
+        <activity
+            android:name="seacoalCo.bill_it.friends.AddFriend"
+            android:parentActivityName="seacoalCo.bill_it.MainDrawerActivity"
+            android:label="@string/title_add_friend" />
+        <activity android:name="seacoalCo.bill_it.SettingsActivity" />
+        <activity
+            android:name="seacoalCo.bill_it.groups.AddGroup"
+            android:parentActivityName="seacoalCo.bill_it.MainDrawerActivity"
+            android:label="@string/title_add_group" />
+        <activity
+            android:name="seacoalCo.bill_it.groups.EditGroup"
+            android:parentActivityName="seacoalCo.bill_it.MainDrawerActivity"
+            android:label="@string/title_edit_group" />
+        <activity android:name="seacoalCo.bill_it.AddFriendsActivity" />
+
+        <activity
+            android:name="seacoalCo.bill_it.SplitActivity"
+            android:parentActivityName="seacoalCo.bill_it.MainDrawerActivity"
+            android:label="@string/title_split_activity"
+            android:windowSoftInputMode="adjustPan"/>
+
+        <activity
+            android:name="seacoalCo.bill_it.camera.google.OcrCaptureActivity"
+            android:parentActivityName="seacoalCo.bill_it.MainDrawerActivity"
+            android:theme="@style/AppTheme.Fullscreen"
+            android:label="@string/title_ocr_activity" />
+        <activity
+            android:name="seacoalCo.bill_it.camera.CropActivity"
+            android:parentActivityName="seacoalCo.bill_it.camera.google.OcrCaptureActivity"
+            android:label="@string/title_crop_activity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name="seacoalCo.bill_it.camera.ImageActivity"
+            android:parentActivityName="seacoalCo.bill_it.camera.CropActivity"
+            android:label="@string/title_image_activity">
+            <intent-filter>
+                <action android:name="seacoalCo.bill_it.ImageActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+    </application>
+</manifest>

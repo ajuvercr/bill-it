@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/user"
+        android:key="@string/user">
+        <seacoalCo.bill_it.utility_classes.ValidatingNamePreference
+            android:key="@string/user_name"
+            android:title="@string/user_name"
+            android:persistent="true"
+            android:defaultValue=" "
+            />
+        <seacoalCo.bill_it.utility_classes.ValidatingMailPreference
+            android:key="@string/email"
+            android:title="@string/email"
+            android:persistent="true"
+            android:inputType="textEmailAddress"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/tutorials"
+        android:key="@string/tutorials">
+        <SwitchPreference android:key="@string/WELCOMETUTORIAL"
+            android:title="@string/welcome_tutotial_title"
+            android:persistent="true"
+            android:defaultValue="true"/>
+        <SwitchPreference android:key="@string/CAPTURETUTORIAL"
+            android:title="@string/capture_tutorial_title"
+            android:persistent="true"
+            android:defaultValue="true" />
+        <SwitchPreference android:key="@string/CROPTUTORIAL"
+                            android:title="@string/crop_tutorial_title"
+                            android:persistent="true"
+                            android:defaultValue="true" />
+        <SwitchPreference
+                            android:key="@string/group_tutorial"
+                            android:title="@string/group_tutorial_title"
+                            android:persistent="true"
+                            android:defaultValue="true" />
+        <SwitchPreference android:key="@string/split_tutorial"
+                            android:title="@string/split_tutorial_title"
+                            android:persistent="true"
+                            android:defaultValue="true" />
+    </PreferenceCategory>
+</PreferenceScreen>

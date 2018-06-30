@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="permission_camera_rationale">Toegang tot de camera is nodig voor detectie</string>
+    <string name="no_camera_permission">Deze applicatie kan niet gebruikt worden omdat het geen camera toegang heeft. De applicatie zal nu sluiten.</string>
+    <string name="low_storage_error">Ocr dependencies kunnen niet gedownload worden door een tekort aan opslagplaats.</string>
+    <string name="title_activity_main">Ocr Detector voorbeeld</string>
+    <string name="ocr_header">Click &quot;Detect Text&quot; om text te detecteren</string>
+    <string name="read_text">Detecteer Text</string>
+    <string name="auto_focus">Auto Focus</string>
+    <string name="use_flash">Gebruik Flash</string>
+    <string name="ocr_success">Text succesvol gelezen</string>
+    <string name="ocr_failure">Geen text gevonden</string>
+    <string name="ocr_error">Probleem bij lezen van text: %1$s</string>
+    <string name="image">afbeelding</string>
+    <string name="im_act_message">Veeg naar links of rechts om items te verwijderen</string>
+    <string name="item_delete">Artikel verwijderd</string>
+    <string name="done">Klaar</string>
+    <string name="quantity">Aantal</string>
+    <string name="description">Beschrijving</string>
+    <string name="unit_price">Prijs/Stuk</string>
+    <string name="total_price">Totale prijs</string>
+    <string name="no_reminder">Herriner mij dit niet nog een keer</string>
+    <string name="crop_message">Snij de afbeelding bij zodat enkel de artikels en hun prijs overblijven (De totale prijs mag er niet bij).</string>
+    <string name="capture_message">Om te verzekeren dat de gewenste text herkend wordt, gelieve te wachten tot kaders rond de text getekend worden. Het is mogelijk dat de autofocus niet goed werkt. Wanneer dit gebeurt, probeer de camera te verwijderen van het ticket en breng deze er dan traag weer naartoe. Als dit ook niet werkt, probeer dan het toestel te draaien naar landscape modus.</string>
+    <string name="tutorials">Handleidingen</string>
+    <string name="crop_tutorial_title" translatable="false">Afbeelding bijsnijden</string>
+    <string name="capture_tutorial_title">Foto nemen</string>
+    <string name="welcome_tutotial_title">Welkom</string>
+    <string name="welcome_message">Welkom bij Bill-it. Als dit je eerste keer hier is, zul je hulpschermen zoals deze zien verschijnen. Je kan deze uitzetten door op het selectievakje te klikken. Als je deze schermen laten weer wil aanzetten, kan u dit doen via de instellingen.</string>
+    <string name="settings" translatable="false">Instellingen</string>
+    <string name="avatar_description">Avatar van een vriend</string>
+    <string name="send">Stuur naar iedereen</string>
+    <string name="title_add_friend">Voeg vriend toe</string>
+    <string name="title_edit_friend">Bewerk vriend</string>
+    <string name="title_add_group">Voeg groep toe</string>
+    <string name="title_edit_group">Bewerk groep</string>
+    <string name="save_edit">Bevestigen</string>
+    <string name="confirm_edit">Bevestigen</string>
+    <string name="user">Gebruikersgegevens</string>
+    <string name="user_name">Weergavenaam</string>
+    <string name="email">E-mail adres</string>
+    <string name="first">Eerste login</string>
+    <string name="fill_in">Gelieve volgende velden in te vullen om de app te gebruiken</string>
+    <string name="name_length_error">Naam moet minstens 2 karakters lang zijn</string>
+    <string name="name_invalid">Naam kan enkel uit letters, spaties en koppeltekens bestaan</string>
+    <string name="email_invalid">Gelieve een geldig E-mail adres in te geven</string>
+    <string name="settings_error">Je kan niet terugkeren voordat je volgende fouten verbetert:</string>
+    <string name="settings_error_detail">Volgende fouten werden in %1$s gevonden:</string>
+    <string name="buyer">Betaler</string>
+    <string name="item">Product</string>
+    <string name="consumer">Consument</string>
+    <string name="password">Wachtwoord</string>
+    <string name="conf_password">Bevestig wachtwoord</string>
+    <string name="pass_length">Wachtwoord moest ten minste 8 karakters lang zijn</string>
+    <string name="pass_no_match">Wachtwoorden moeten overeen komen</string>
+    <string name="local_user">Lokale gebruiker</string>
+    <string name="online_user">Online gebruiker</string>
+    <string name="difference"><u>Wat is het verschil?</u></string>
+    <string name="add_instruction">Om een online vriend toe te voegen, vul de ID van je vriend in in onderstaand veld</string>
+    <string name="clip_copy">Copiëer naar klembord</string>
+    <string name="your_id">Jouw id: </string>
+    <string name="friends_explanation">Een lokale vriend is een vriend die alleen voor jouw app bestaat.
+        Deze vriend wordt lokaal opgeslagen(met ook een kopie op de server) en vereist geen toegang tot
+        het internet om toegevoegd te worden. \n\n
+        Een online vriend is een vriend met een eigen account. Wanneer je een online vriend aan één
+        van je groepen toevoegd, kan deze de schulden volgen via de app op dezelfde manier als jij.</string>
+    <string name="friends">Vrienden</string>
+    <string name="groups">Groupen</string>
+    <string name="add_friend">Voeg vriend toe</string>
+    <string name="add_group">Add Group</string>
+    <string name="ocr_capture">Camera</string>
+    <string name="remove_from_group_error">Alleen de groepseigenaar kan andere mensen verwijderen.</string>
+    <string name="friend_added">Vriend toegevoegd</string>
+    <string name="log_out">Log uit</string>
+    <string name="swipe_instructions">Veeg omhoog om te verdelen, veeg omlaag om te verwijderen</string>
+    <string name="edit_item">Bewerk item</string>
+    <string name="price_invalid">Ongeldige prijs</string>
+    <string name="cancel">Annuleer</string>
+    <string name="title_crop_activity">Bijsnijden</string>
+    <string name="title_image_activity">Bewerk items</string>
+    <string name="title_split_activity">Verdeel items</string>
+    <string name="split_tutorial_title">Item verdeling</string>
+    <string name="split_tutorial_message">Veeg het middelste item omhoog om het te verdelen tussen de koper en de consument. De koper zal krediet krijgen en de consument zal krediet verliezen. Aligneer de koper en de consument met het item om deze te selecteren. Veeg omlaag om te verwijderen. Duw lang om aan te passen.</string>
+    <string name="group_tutorial_title">Groep overzicht</string>
+    <string name="group_tutorial_message">Bewerk de groepsnaam, voeg een nieuw lid toe, verwijder leden door links of rechts te vegen, voeg items manueel toe, scan een ticket of verdeel items</string>
+    <string name="title_ocr_activity">Voeg een scan toe voor:</string>
+    <string name="add_members">Voeg leden toe</string>
+    <string name="add_item">Voeg item toe</string>
+    <string name="price">prijs</string>
+    <string name="item_name">Item naam</string>
+</resources>
