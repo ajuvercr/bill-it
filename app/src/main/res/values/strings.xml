@@ -130,6 +130,7 @@
     <string name="group_tutorial" translatable="false">group_tutorial</string>
     <string name="group_tutorial_title">Group overview</string>
     <string name="group_tutorial_message">Edit group name, add new group members, send an overview to group members, remove members by swiping left or right, manually add items, scan items or split them.</string>
+    <string name="scan_qr_code">Scan QR-code</string>
     <plurals name="divide_items">
         <item quantity="one">Divide %d item</item>
         <item quantity="other">Divide %d items</item>
