@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file:///media/Data/School/UGent/Bach2/AppDev/selab1/BillIt/BillIt.iml" filepath="/media/Data/School/UGent/Bach2/AppDev/selab1/BillIt/BillIt.iml" />
-      <module fileurl="file:///media/Data/School/UGent/Bach2/AppDev/selab1/BillIt/app/app.iml" filepath="/media/Data/School/UGent/Bach2/AppDev/selab1/BillIt/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bill-it.iml" filepath="$PROJECT_DIR$/bill-it.iml" />
     </modules>
   </component>
 </project>

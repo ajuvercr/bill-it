@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "965509035052",
-    "firebase_url": "https://bill-it-29c08.firebaseio.com",
-    "project_id": "bill-it-29c08",
-    "storage_bucket": "bill-it-29c08.appspot.com"
+    "project_number": "504257050425",
+    "firebase_url": "https://bill-it-28db7.firebaseio.com",
+    "project_id": "bill-it-28db7",
+    "storage_bucket": "bill-it-28db7.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:965509035052:android:0e55fd411957f933",
+        "mobilesdk_app_id": "1:504257050425:android:edaf09dc6ec47e01",
         "android_client_info": {
-          "package_name": "e.tibod.ticketscannerv2"
+          "package_name": "seacoalCo.bill_it"
         }
       },
       "oauth_client": [
         {
-          "client_id": "965509035052-v71m8gj1ds3igmneb5ncd1j5o8emfncg.apps.googleusercontent.com",
+          "client_id": "504257050425-9mpt6mki60i0uomqigt5040lbu6oqafv.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAHiimRgjcYJKpmIPtn_lgq5fOXyYFon14"
+          "current_key": "AIzaSyDRez_0Lx6_QzMouQlOSqqzF3odkQ9Qka8"
         }
       ],
       "services": {

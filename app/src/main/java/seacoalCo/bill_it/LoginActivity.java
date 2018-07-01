@@ -20,7 +20,7 @@ import seacoalCo.bill_it.utility_classes.TutorialBuilder;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private FirebaseAuth auth = FirebaseAuth.getInstance();
+    private FirebaseAuth auth;
     private boolean backToButtons = false;
     private boolean working = false;
 
@@ -29,6 +29,10 @@ public class LoginActivity extends AppCompatActivity {
         Log.d("create", "created");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        FirebaseApp.initializeApp(this);
+
+        auth = FirebaseAuth.getInstance();
 
         // initialize settings
         Store.init(
