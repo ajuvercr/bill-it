@@ -36,25 +36,9 @@ fn main() {
 
     let socket = TcpListener::bind(&addr, &handle).unwrap();
     println!("Listening on: {}", addr);
+    let mut server = Server::new();
 
-    let done = socket.incoming().for_each(move |(socket, addr)| {
-
-        let (reader, writer) = socket.split();
-        let amt = copy(reader, writer);
-
-        let msg = amt.then(move |result| {
-            match result {
-                Ok((amt, _, _)) => println!("wrote {} bytes to {}", amt, addr),
-                Err(e) => println!("error on {}: {}", addr, e),
-            }
-
-            Ok(())
-        });
-
-        handle.spawn(msg);
-
-        Ok(())
-    });
+    let (done, mut server) = server.listen(socket, core.handle());
 
     let me: User = User::new();
     let mut me_group: Group = Group::new();
@@ -68,7 +52,6 @@ fn main() {
     println!("this is my group {:?}", me_group);
     println!("this is my other group {:?}", other_me_group);
 
-    let mut server = Server::new();
     server.handle_event(Event::Update(Update::Group {group: me_group, id: "hallo".to_string()}));
     if let Err(e) = server.save("db.json"){
         println!("couldn't save: {:?}", e);

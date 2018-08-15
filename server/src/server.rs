@@ -1,7 +1,21 @@
 extern crate serde_json;
 
+use futures::*;
+use futures::Future;
+use futures::stream::{self, Stream};
+use futures::sync::mpsc;
+use tokio_core::reactor::Handle;
+use futures::stream::ForEach;
+use tokio_io::io;
+use tokio_core::net::Incoming;
+use tokio_core::net::TcpListener;
+
 use std;
+use std::io::{Error, ErrorKind, BufReader};
+use std::iter;
 use std::collections::HashMap;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 use types::User;
 use types::Group;
@@ -38,20 +52,78 @@ impl State {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Server {
     state: State,
-    conn_in: Vec<u32>,
-    conn_out: Vec<u32>,
+    connections: Rc<RefCell<HashMap<std::net::SocketAddr, mpsc::UnboundedSender<Event>>>>,
 }
 
 impl Server {
     pub fn new() -> Server {
         Server {
             state: State::new(),
-            conn_in: Vec::new(),
-            conn_out: Vec::new(),
+            connections: Rc::new(RefCell::new(HashMap::new()))
         }
+    }
+
+    pub fn listen(self, socket: TcpListener, handle: Handle) -> (impl Future<Item = (), Error = Error>, Server) {
+        //let connections = connections.clone();
+        (socket.incoming().for_each(move |(stream, addr)| {
+            use tokio_io::AsyncRead;
+            println!("new connection! {:?}", addr);
+            let (reader, writer) = stream.split();
+
+            let (tx, rx) = mpsc::unbounded();
+            self.connections.borrow_mut().insert(addr, tx);
+
+            let connection_inner = self.connections.clone();
+            let reader = BufReader::new(reader);  
+
+            let iter = stream::iter_ok(iter::repeat(()));
+            let socket_reader = iter.fold(reader, move |reader, _| {
+                let line = io::read_until(reader, b'\n', Vec::new());
+                let line = line.and_then(|(reader, vec)|{
+                    if vec.len() == 0 {
+                        Err(Error::new(ErrorKind::BrokenPipe, "broken pipe"))
+                    }else{
+                        Ok((reader, vec))
+                    }
+                });
+
+                let line = line.map(|(reader, message)| {
+                    (reader, Event::from_bytes(message))
+                });
+
+                let connections = connection_inner.clone();
+
+                line.map(move |(reader, event)| {
+                    let mut conns = connections.borrow_mut();
+                    if event.is_error() {
+                        let tx = conns.get_mut(&addr).unwrap();
+                        tx.unbounded_send(event);
+                    }else{
+                        self.handle_event(event);
+                    }
+                    reader
+                })
+            }); // return socket_reader
+
+            let socket_writer = rx.fold(writer, |writer, event| {
+                let amt = io::write_all(writer, event.into_bytes());
+                let amt = amt.map(|(writer, _)| writer);
+                amt.map_err(|_| ())
+            });
+
+            let connections = self.connections.clone();
+            let socket_reader = socket_reader.map_err(|_: Error| ());
+            let connection = socket_reader.map(|_| ()).select(socket_writer.map(|_| ()));
+            handle.spawn(connection.then(move |_| {
+                connections.borrow_mut().remove(&addr);
+                println!("Connection {} closed.", addr);
+                Ok(())
+            }));
+
+            Ok(())
+        }), self)
     }
 
     pub fn save(&self, location: &str) -> std::io::Result<()> {
@@ -88,6 +160,9 @@ impl Server {
             },
             Event::Notify {id} => {
                 println!("notifying id: {}", id);
+            },
+            Event::Error {error} => {
+                println!("Shit happend {}", error);
             }
         }
     }

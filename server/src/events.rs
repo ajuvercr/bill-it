@@ -8,6 +8,7 @@ pub enum Event {
     Update(Update),
     Get(Get),
     Notify {id: Id},
+    Error {error: String},
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -22,5 +23,22 @@ pub enum Update {
 pub enum Get {
     User {id: Id},
     Group {id: Id},
+}
+
+impl Event {
+    pub fn from_bytes(bytes: Vec<u8>) -> Event {
+        Event::Error {error: "You died".to_string()}
+    }
+
+    pub fn into_bytes(&self) -> Vec<u8> {
+        Vec::new()
+    }
+
+    pub fn is_error(&self) -> bool {
+        match self {
+            Event::Error {error} => true,
+            _ => false,
+        }
+    }
 }
 
