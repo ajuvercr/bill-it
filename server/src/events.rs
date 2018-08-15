@@ -1,6 +1,7 @@
 
 use types::{Group, User};
 use server::Id;
+use serde_json;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag= "type")]
@@ -27,16 +28,21 @@ pub enum Get {
 
 impl Event {
     pub fn from_bytes(bytes: Vec<u8>) -> Event {
-        Event::Error {error: "You died".to_string()}
+        match serde_json::from_slice(&bytes) {
+            Ok(e) => e,
+            Err(e) => Event::Error{error: format!("couldn't derive from bytes: {}", e)},
+        }
     }
 
     pub fn into_bytes(&self) -> Vec<u8> {
-        Vec::new()
+        let mut out = serde_json::to_string(self).unwrap();
+        out.push_str("\n");
+        out.into_bytes()
     }
 
     pub fn is_error(&self) -> bool {
         match self {
-            Event::Error {error} => true,
+            Event::Error {error: _} => true,
             _ => false,
         }
     }

@@ -1,1 +1,1 @@
-{"users":{},"groups":{"hallo":{"name":"Test group ofcourse","users":[{"name":"John","age":18}]}}}
+{"users":{"me":{"name":"John","age":18}},"groups":{}}
