@@ -37,6 +37,7 @@ impl State {
                 self.groups.insert(id.clone(), group);
                 Event::Notify {id: id}
             },
+
             Update::User {user, id} => {
                 self.users.insert(id.clone(), user);
                 Event::Notify {id: id}
@@ -47,7 +48,7 @@ impl State {
 
 pub struct Server {
     state: State,
-    connections: Rc<RefCell<HashMap<std::net::SocketAddr, mpsc::UnboundedSender<Event>>>>,
+    connections: Rc<RefCell<HashMap<String, mpsc::UnboundedSender<Event>>>>,
     handle: UnboundedReceiver<Event>
 }
 
@@ -68,7 +69,7 @@ impl Future for Server {
 
 impl Server {
     pub fn new(
-            connections: Rc<RefCell<HashMap<std::net::SocketAddr, mpsc::UnboundedSender<Event>>>>, 
+            connections: Rc<RefCell<HashMap<String, mpsc::UnboundedSender<Event>>>>, 
             handle: UnboundedReceiver<Event>) -> Server {
         Server {
             state: State::new(),
@@ -104,10 +105,13 @@ impl Server {
         match event {
             Event::Update(update) => {
                 let event = self.state.handle_update(update);
-                self.save(&"db.json".to_string());
+
+                // unhandled result
+                self.save(&"db.json".to_string()).unwrap();
                 self.handle_event(event);
             },
             Event::Get(get) => {
+
                 println!("getting {:?}", get);
             },
             Event::Notify {id} => {

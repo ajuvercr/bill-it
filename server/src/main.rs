@@ -44,51 +44,70 @@ fn main() {
     let socket = TcpListener::bind(&server_addr, &handle).unwrap();
     println!("Listening on: {}", server_addr);
 
+    let server_addr = String::from("Server");
+
     let connections = Rc::new(RefCell::new(HashMap::new()));
     let (server_handle, rx) = mpsc::unbounded();
-    connections.borrow_mut().insert(server_addr, server_handle);
+    connections.borrow_mut().insert(server_addr.clone(), server_handle);
     let mut server = Server::new(connections.clone(), rx);
 
-    let done = socket.incoming().for_each(move |(stream, addr)| {
+    let done = socket.incoming().for_each(|(stream, addr)| {
         use tokio_io::AsyncRead;
+
         println!("new connection! {:?}", addr);
         let (reader, writer) = stream.split();
 
-        let (tx, rx) = mpsc::unbounded();
-        connections.borrow_mut().insert(addr, tx);
 
-        let connection_inner = connections.clone();
+
+        // let mut id = [0;4];
+        // reader.poll_read(&mut id[..]).unwrap();
+        // println!("new connection with id: {}", String::from_utf8(id.to_vec()).unwrap());
+
+
         let reader = BufReader::new(reader);  
+        let (tx, rx) = mpsc::unbounded();
+        let cc = connections.clone();
 
-        let iter = stream::iter_ok(iter::repeat(()));
-        let socket_reader = iter.fold(reader, move |reader, _| {
-            let line = io::read_until(reader, b'\n', Vec::new());
-            let line = line.and_then(|(reader, vec)|{
-                if vec.len() == 0 {
-                    Err(Error::new(ErrorKind::BrokenPipe, "broken pipe"))
-                }else{
-                    Ok((reader, vec))
-                }
-            });
+        let socket_reader = io::read_until(reader, b'\n', Vec::new()).and_then(move |(reader, mut id)| {
 
-            let line = line.map(|(reader, message)| {
-                (reader, Event::from_bytes(message))
-            });
+            id.retain(|x| *x != b'\n');
+        
+            let id = String::from_utf8(id).unwrap();
+            println!("new connection with id {}", &id);
 
-            let connections = connection_inner.clone();
+            let connection_inner = cc.clone();
+            connection_inner.borrow_mut().insert(id.clone(), tx);
 
-            line.map(move |(reader, event)| {
-                let mut conns = connections.borrow_mut();
-                println!("got event: {:?}", event);
-                let tx = if event.is_error() { 
-                    conns.get_mut(&addr).unwrap()
-                } else {
-                    conns.get_mut(&server_addr).unwrap()
-                };
-                tx.unbounded_send(event).unwrap();
-                reader
-            })
-        }); // return socket_reader
+            let iter = stream::iter_ok(iter::repeat(()));
+            let socket_reader = iter.fold(reader, move |reader, _| {
+                let line = io::read_until(reader, b'\n', Vec::new());
+                let line = line.and_then(|(reader, vec)|{
+                    if vec.len() == 0 {
+                        Err(Error::new(ErrorKind::BrokenPipe, "broken pipe"))
+                    }else{
+                        Ok((reader, vec))
+                    }
+                });
+
+                let line = line.map(|(reader, message)| {
+                    (reader, Event::from_bytes(message))
+                });
+
+                let connections = connection_inner.clone();
+                let id_inner = id.clone();
+
+                line.map(move |(reader, event)| {
+                    let mut conns = connections.borrow_mut();
+                    println!("got event: {:?}", event);
+                    let saddr = String::from("Server");
+                    let address = if event.is_error() { &id_inner } else { &saddr };
+                    let tx = conns.get_mut(address).unwrap();
+                    tx.unbounded_send(event).unwrap();
+                    reader
+                })
+            }); // return socket_reader
+            socket_reader
+        });
 
         let socket_writer = rx.fold(writer, |writer, event| {
             let amt = io::write_all(writer, event.into_bytes());
@@ -99,8 +118,9 @@ fn main() {
         let connections = connections.clone();
         let socket_reader = socket_reader.map_err(|_: std::io::Error| ());
         let connection = socket_reader.map(|_| ()).select(socket_writer.map(|_| ()));
+
         handle.spawn(connection.then(move |_| {
-            connections.borrow_mut().remove(&addr);
+            //connections.borrow_mut().remove(&addr);
             println!("Connection {} closed.", addr);
             Ok(())
         }));
