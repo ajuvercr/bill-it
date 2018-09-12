@@ -3,14 +3,14 @@ use std::net::SocketAddr;
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::rc::Rc;
-use std::io::{Error, ErrorKind, BufReader};
+use std::io::{Error, ErrorKind};
 use std::mem;
 
 
 use futures::sync::mpsc;
-use futures::{Future, Async, Poll, Stream};
+use futures::{Future, Poll, Stream};
 
-use tokio_core::net::{TcpListener, TcpStream};
+use tokio_core::net::{TcpStream};
 
 use tokio_core::reactor::Handle;
 use tokio_io::io;
@@ -33,21 +33,18 @@ impl ConnectionHandler {
         }
     }
 
-    pub fn new_connection(&self, stream: TcpStream, addr: SocketAddr) {
+    pub fn new_connection(&self, stream: TcpStream, _addr: SocketAddr) {
         use tokio_io::AsyncRead;
 
-        //connHandler.new_connection(stream.clone(), addr);
-
-
-        println!("new connection! {:?}", addr);
         let (reader, writer) = stream.split();
 
-        // let mut id = [0;4];
-        // reader.poll_read(&mut id[..]).unwrap();
-        // println!("new connection with id: {}", String::from_utf8(id.to_vec()).unwrap());
         let (tx, rx) = mpsc::unbounded::<Event>();
 
-        let conn = Connection::new(tx, reader, self.conns.clone(), self.server_addr.clone());
+        let conn = Connection::new(tx, reader, self.conns.clone(), self.server_addr.clone())
+            .then(|e| {
+                println!("{:?}", e);
+                e
+            });
 
         let socket_writer = rx.fold(writer, |writer, event| {
             let amt = io::write_all(writer, event.into_bytes());
@@ -55,16 +52,10 @@ impl ConnectionHandler {
             amt.map_err(|_| ())
         });
 
-        let connections = self.conns.clone();
-        let socket_reader = conn.map_err(|_| ());
-        let connection = socket_reader.map(|_| ()).select(socket_writer.map(|_| ()));
-        let s_addr = self.server_addr.clone();
+        let socket_reader = conn;
+        let connection = socket_reader.select(socket_writer.then(|_| Ok(())));
 
-        self.handle.spawn(connection.then(move |_| {
-            connections.borrow_mut().remove(&s_addr);
-            println!("disconnecting {:?}", s_addr);
-            Ok(())
-        }));
+        self.handle.spawn(connection.then(|_| Ok(())));
     }
 
 }
@@ -95,16 +86,31 @@ impl Connection {
         }
     }
 
-    fn parse_id(&mut self, id_bytes: Vec<u8>) {
+    fn parse_id(&mut self, id_bytes: Vec<u8>) -> bool {
         let id = String::from_utf8(id_bytes).unwrap();
         let sender = mem::replace(&mut self.id, Ok(id.clone()));
-        self.conns.borrow_mut().insert(id, sender.unwrap_err());
+        println!("new connection with id {}", id);
+        let mut conns = self.conns.borrow_mut();
+
+        if conns.contains_key(&id) {
+            // when sender goes out of scope, Unbounded sender get's closed
+            // so Unbounded Reciever get's closed, so future stops
+            let sender = sender.unwrap_err();
+            sender.unbounded_send(Event::invalid_connect()).unwrap();
+            println!("Invalid connect, bumping");
+            false
+        } else {
+            conns.insert(id, sender.unwrap_err());
+            println!("connection map: {:?}", conns.keys());
+            true
+        }
     }
 
-    fn parse_event(&mut self, bytes: Vec<u8>) {
-        println!("parsing event");
+    fn parse_event(&mut self, bytes: Vec<u8>) -> bool {
+        println!("parsing event for {:?}", self.id);
+
         if bytes.len() == 0 {
-            return;
+            return false;
         }
 
         let event = Event::from_bytes(bytes);
@@ -113,15 +119,23 @@ impl Connection {
         let address = if event.is_error() { &id } else { &self.server_addr };
         let tx = conns.get_mut(address).unwrap();
         tx.unbounded_send(event).unwrap();
+        true
     }
 
-    fn act(&mut self, line: Vec<u8>) {
+    fn act(&mut self, line: Vec<u8>) -> bool {
         match self.state {
             State::GetID => {
-                self.parse_id(line);
                 self.state = State::Parsing;
+                self.parse_id(line)
             },
             State::Parsing => self.parse_event(line),
+        }
+    }
+
+    fn disconnect(&self) {
+        if let Ok(addr) = self.id.clone() {
+            self.conns.borrow_mut().remove(&addr);
+            println!("disconnecting {:?}", addr);
         }
     }
 }
@@ -130,12 +144,13 @@ impl Future for Connection {
     type Item = ();
     type Error = Error;
 
-    fn poll(&mut self) -> Poll<self::Item, self::Error> {
+    fn poll(&mut self) -> Poll<(), self::Error> {
         loop {
             try_ready!(self.reader.read_buf(&mut self.buf));
 
             if self.buf.len() == 0 {
-                //return Err("broken pipe");
+                self.disconnect();
+                return Err(Error::new(ErrorKind::BrokenPipe, "broken pipe"));
             }
 
             let buf = self.buf.clone();
@@ -149,8 +164,6 @@ impl Future for Connection {
                 self.act(l.to_vec());
             }
         }
-
-        Ok(Async::NotReady)
     }
 }
 

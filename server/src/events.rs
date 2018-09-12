@@ -46,5 +46,9 @@ impl Event {
             _ => false,
         }
     }
+
+    pub fn invalid_connect() -> Event {
+        Event::Error{error: "Invalid Connect: id already connected".to_string()}
+    }
 }
 

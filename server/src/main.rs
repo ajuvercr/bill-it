@@ -13,31 +13,26 @@ extern crate serde_json;
 
 use std::env;
 use std::net::SocketAddr;
-use std::io::{Error, ErrorKind, BufReader};
-use std::iter;
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use futures::Future;
-use futures::stream::{self, Stream};
+use futures::stream::{Stream};
 use futures::sync::mpsc;
-use tokio_io::io;
 
 
-use tokio_core::net::{TcpListener, TcpStream};
+use tokio_core::net::{TcpListener};
 use tokio_core::reactor::Core;
 
 mod server;
 use server::Server;
 mod types;
 use types::User;
-use types::Group;
 mod events;
 use events::{Event, Update};
 
-mod connectionHandler;
-use connectionHandler::ConnectionHandler;
+mod connection_handler;
+use connection_handler::ConnectionHandler;
 
 fn main() {
     let addr = env::args().nth(1).unwrap_or("127.0.0.1:8080".to_string());
@@ -57,10 +52,10 @@ fn main() {
     connections.borrow_mut().insert(server_addr.clone(), server_handle);
     let server = Server::new(connections.clone(), rx);
 
-    let connHandler = ConnectionHandler::new(handle.clone(), connections.clone(), server_addr.clone());
+    let conn_handler = ConnectionHandler::new(handle.clone(), connections.clone(), server_addr.clone());
 
     let done = socket.incoming().for_each(|(stream, addr)| {
-        connHandler.new_connection(stream, addr);
+        conn_handler.new_connection(stream, addr);
         Ok(())
     });
 
