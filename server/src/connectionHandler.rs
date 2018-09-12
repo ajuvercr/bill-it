@@ -62,49 +62,17 @@ impl ConnectionHandler {
 
         self.handle.spawn(connection.then(move |_| {
             connections.borrow_mut().remove(&s_addr);
+            println!("disconnecting {:?}", s_addr);
             Ok(())
         }));
     }
 
 }
 
-// struct Connection {
-//     eRec: mpsc::UnboundedReceiver<Event>,
-//     connHandler: ConnectionHandler,
-// }
-
-// impl Connection {
-//     fn new(handler: &ConnectionHandler, reader: ReadHalf<TcpStream>) -> Connection {
-//         let (tx, rx) = mpsc::unbounded::<Event>();
-//         let reader = BufReader::new(reader);
-
-//         let b = Connection::get_id(handler.clone(), reader, tx);
-
-//         Connection {
-//             eRec: rx,
-//             connHandler: handler.clone(),
-//         }
-//     }
-
-//     fn get_id<T>(connHandler: ConnectionHandler, reader: BufReader<ReadHalf<TcpStream>>, tx: mpsc::UnboundedSender<Event>) 
-//             -> impl Future<Item = (BufReader<ReadHalf<TcpStream>>, String), Error = Error>{
-//         io::read_until(reader, b'\n', Vec::new()).and_then(move |(reader, mut id)| {
-//             id.retain(|x| *x != b'\n');
-    
-//             // TODO: Do some possible authentification
-//             let id = String::from_utf8(id).unwrap();
-//             connHandler.conns.borrow_mut().insert(id.clone(), tx);
-
-//             Ok((reader, id))
-//         })
-//     }
-// }
-
 enum State {
     GetID,
     Parsing,
 }
-
 
 struct Connection {
     conns: Rc<RefCell<HashMap<String, mpsc::UnboundedSender<Event>>>>,
@@ -139,7 +107,6 @@ impl Connection {
             return;
         }
 
-
         let event = Event::from_bytes(bytes);
         let mut conns = self.conns.borrow_mut();
         let id = self.id.clone().unwrap();
@@ -163,9 +130,13 @@ impl Future for Connection {
     type Item = ();
     type Error = Error;
 
-    fn poll(&mut self) -> Poll<(), self::Error> {
+    fn poll(&mut self) -> Poll<self::Item, self::Error> {
         loop {
             try_ready!(self.reader.read_buf(&mut self.buf));
+
+            if self.buf.len() == 0 {
+                //return Err("broken pipe");
+            }
 
             let buf = self.buf.clone();
             let mut lines = buf.as_slice().split(|x| *x == b'\n').clone();
@@ -181,6 +152,5 @@ impl Future for Connection {
 
         Ok(Async::NotReady)
     }
-    // add code here
 }
 
