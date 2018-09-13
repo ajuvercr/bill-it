@@ -1,1 +1,1 @@
-{"users":{"me":{"name":"John","email":"blabla@gmail.com","id":"Some random user id","friends":[],"groups":[]}},"groups":{}}
+{"users":{"me":{"name":"John","email":"blabla@gmail.com","id":"Some random user id","friends":["me"],"groups":[]}},"groups":{}}

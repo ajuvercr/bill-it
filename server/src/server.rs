@@ -31,6 +31,7 @@ impl State {
     fn handle_update(&mut self, update: Update) -> Event {
         match update {
             Update::Group {group, id} => {
+                //TODO: send update to removed user
                 self.groups.insert(id.clone(), group.clone());
                 Event::Notify(Type::Group(group))
             },
@@ -104,7 +105,10 @@ impl Server {
 
     fn handle_server_event(&mut self, event: ServerEvent, id: Id) {
         match event {
-            ServerEvent::Connect(sender) => {self.connections.insert(id, sender);},
+            ServerEvent::Connect(sender) => {
+                self.connections.insert(id.clone(), sender); 
+                self.handle_event(Event::Get(Get::User{user: id.clone()}), id)
+            },
             ServerEvent::Disconnect => {self.connections.remove(&id);},
             ServerEvent::Event(event) => self.handle_event(event, id),
         }
@@ -144,11 +148,33 @@ impl Server {
                 println!("getting group {:?}", group);
             },
             Event::Notify(Type::User(user)) => {
+                self.handle_event(Event::Get(Get::User{ user: user.id.clone()}), id.clone());
+                user.friends.iter().for_each(|u_id| {
+                    self.handle_event(
+                        Event::Get(Get::User{ user: user.id.clone()}), 
+                        u_id.clone()
+                    );
+                });
+
+                user.groups.iter().for_each(|g_id| {
+                    if self.state.groups.contains_key(g_id) {
+                        let group = self.state.groups.get(g_id).unwrap().clone();
+                        self.handle_event(
+                            Event::Notify(Type::Group(group)), id.clone());
+                    } else {
+                        println!("shouldn't have happend, someone has invalid group with id {:?}", g_id);          
+                    }
+                });
 
                 println!("notifying user: {:?}", user);
             },
             Event::Notify(Type::Group(group)) => {
-
+                group.userIds.iter().for_each(|u_id| {
+                    self.handle_event(
+                        Event::Get(Get::Group{ group: group.id.clone()}), 
+                        u_id.clone()
+                    )
+                });
                 println!("notifying group: {:?}", group);
             },
             Event::Error {error} => {
