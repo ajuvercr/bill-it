@@ -31,3 +31,19 @@ impl Type {
         }
     }
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Item {
+    price: isize,
+    name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Expense {
+    item: Item,
+    buyer: String,
+    consumer: String,
+    nullBuyer: bool,
+    nullConsumer: bool,
+}
+

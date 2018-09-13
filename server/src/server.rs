@@ -7,8 +7,6 @@ use futures::sync::mpsc::UnboundedReceiver;
 
 use std;
 use std::collections::HashMap;
-use std::cell::RefCell;
-use std::rc::Rc;
 
 use types::{User, Group, Type};
 
@@ -152,12 +150,15 @@ impl Server {
             Event::Notify(Type::Group(group)) => {
 
                 println!("notifying group: {:?}", group);
-            }
-            Event::Notify(Type::Error{error}) => {
-                println!("ERRORRRRRRRRRRRRR {:?}", error);
-            }
+            },
             Event::Error {error} => {
                 println!("Shit happend {}", error);
+                if let Some(mut sender) = self.connections.get(&id) {
+                    sender.unbounded_send(Type::Error{error}).unwrap();
+                }
+            },
+            e => {
+                println!("shouldn't happen, got event {:?}", e);
             }
         }
     }
