@@ -17,19 +17,19 @@ use tokio_io::io;
 use tokio_io::AsyncRead;
 use tokio::io::ReadHalf;
 
-use events::{Event};
+use events::{Event, ServerEvent};
+use types::{Id, Type};
 
 #[derive(Clone)]
 pub struct ConnectionHandler {
     handle: Handle,
-    conns: Rc<RefCell<HashMap<String, mpsc::UnboundedSender<Event>>>>,
-    server_addr: String
+    server_handle: mpsc::UnboundedSender<(ServerEvent, Id)>,
 }
 
 impl ConnectionHandler {
-    pub fn new(handle: Handle, conns: Rc<RefCell<HashMap<String, mpsc::UnboundedSender<Event>>>>, server_addr: String) -> ConnectionHandler {
+    pub fn new(handle: Handle, server_handle: mpsc::UnboundedSender<(ServerEvent, Id)>) -> ConnectionHandler {
         ConnectionHandler {
-            handle, conns, server_addr
+            handle, server_handle
         }
     }
 
@@ -38,9 +38,9 @@ impl ConnectionHandler {
 
         let (reader, writer) = stream.split();
 
-        let (tx, rx) = mpsc::unbounded::<Event>();
+        let (tx, rx) = mpsc::unbounded();
 
-        let conn = Connection::new(tx, reader, self.conns.clone(), self.server_addr.clone())
+        let conn = Connection::new(tx, reader, self.server_handle.clone())
             .then(|e| {
                 println!("{:?}", e);
                 e
@@ -66,63 +66,58 @@ enum State {
 }
 
 struct Connection {
-    conns: Rc<RefCell<HashMap<String, mpsc::UnboundedSender<Event>>>>,
     reader: ReadHalf<TcpStream>,
-    id: Result<String, mpsc::UnboundedSender<Event>>,
+    id: Result<Id, mpsc::UnboundedSender<Type>>,
     buf: Vec<u8>,
     state: State,
-    server_addr: String,
+    server_handle: mpsc::UnboundedSender<(ServerEvent, Id)>,
 }
 
 impl Connection {
-    fn new(sender: mpsc::UnboundedSender<Event>, reader: ReadHalf<TcpStream>, conns: Rc<RefCell<HashMap<String, mpsc::UnboundedSender<Event>>>>, server_addr: String) 
+    fn new(sender: mpsc::UnboundedSender<Type>, reader: ReadHalf<TcpStream>, server_handle: mpsc::UnboundedSender<(ServerEvent, Id)>) 
         -> Connection {
         Connection {
-            conns, reader,
+            reader,
             id: Err(sender),
             buf: Vec::new(),
             state: State::GetID,
-            server_addr,
+            server_handle,
         }
     }
 
-    fn parse_id(&mut self, id_bytes: Vec<u8>) -> bool {
+    fn parse_id(&mut self, id_bytes: Vec<u8>) {
         let id = String::from_utf8(id_bytes).unwrap();
         let sender = mem::replace(&mut self.id, Ok(id.clone()));
         println!("new connection with id {}", id);
-        let mut conns = self.conns.borrow_mut();
 
-        if conns.contains_key(&id) {
-            // when sender goes out of scope, Unbounded sender get's closed
-            // so Unbounded Reciever get's closed, so future stops
-            let sender = sender.unwrap_err();
-            sender.unbounded_send(Event::invalid_connect()).unwrap();
-            println!("Invalid connect, bumping");
-            false
-        } else {
-            conns.insert(id, sender.unwrap_err());
-            println!("connection map: {:?}", conns.keys());
-            true
-        }
+        self.server_handle.unbounded_send((ServerEvent::Connect(sender.unwrap_err()), id)).unwrap();
+
+        // sender.unwrap_err().unbounded_send()
+
+        // if conns.contains_key(&id) {
+        //     // when sender goes out of scope, Unbounded sender get's closed
+        //     // so Unbounded Reciever get's closed, so future stops
+        //     let sender = sender.unwrap_err();
+        //     sender.unbounded_send(Event::invalid_connect()).unwrap();
+        //     println!("Invalid connect, bumping");
+        //     false
+        // } else {
+        //     conns.insert(id, sender.unwrap_err());
+        //     println!("connection map: {:?}", conns.keys());
+        //     true
+        // }
     }
 
-    fn parse_event(&mut self, bytes: Vec<u8>) -> bool {
+    fn parse_event(&mut self, bytes: Vec<u8>) {
         println!("parsing event for {:?}", self.id);
 
-        if bytes.len() == 0 {
-            return false;
-        }
-
         let event = Event::from_bytes(bytes);
-        let mut conns = self.conns.borrow_mut();
         let id = self.id.clone().unwrap();
-        let address = if event.is_error() { &id } else { &self.server_addr };
-        let tx = conns.get_mut(address).unwrap();
-        tx.unbounded_send(event).unwrap();
-        true
+        println!("{:?}", event);
+        self.server_handle.unbounded_send((ServerEvent::Event(event), id));
     }
 
-    fn act(&mut self, line: Vec<u8>) -> bool {
+    fn act(&mut self, line: Vec<u8>) {
         match self.state {
             State::GetID => {
                 self.state = State::Parsing;
@@ -133,9 +128,9 @@ impl Connection {
     }
 
     fn disconnect(&self) {
-        if let Ok(addr) = self.id.clone() {
-            self.conns.borrow_mut().remove(&addr);
-            println!("disconnecting {:?}", addr);
+        if let Ok(id) = self.id.clone() {
+            println!("disconnecting {:?}", id);
+            self.server_handle.unbounded_send((ServerEvent::Disconnect, id)).unwrap();
         }
     }
 }

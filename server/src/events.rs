@@ -1,6 +1,7 @@
 
-use types::{Group, User};
-use server::Id;
+use futures::sync::mpsc;
+
+use types::{Group, User, Type, Id};
 use serde_json;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -8,8 +9,23 @@ use serde_json;
 pub enum Event {
     Update(Update),
     Get(Get),
-    Notify {id: Id},
+    Notify(Type),
     Error {error: String},
+}
+
+#[derive(Debug, Clone)]
+pub enum ServerEvent {
+    Connect(mpsc::UnboundedSender<Type>),
+    Event(Event),
+    Disconnect,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(untagged)]
+pub enum SendTypes {
+    User(User),
+    Group(Group),
+    Error(String)
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -22,8 +38,8 @@ pub enum Update {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(untagged)]
 pub enum Get {
-    User {id: Id},
-    Group {id: Id},
+    User {user: Id},
+    Group {group: Id},
 }
 
 impl Event {

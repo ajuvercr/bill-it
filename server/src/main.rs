@@ -29,7 +29,7 @@ use server::Server;
 mod types;
 use types::User;
 mod events;
-use events::{Event, Update};
+use events::{Event, Update, Get};
 
 mod connection_handler;
 use connection_handler::ConnectionHandler;
@@ -44,15 +44,11 @@ fn main() {
     let socket = TcpListener::bind(&server_addr, &handle).unwrap();
     println!("Listening on: {}", server_addr);
 
-    let server_addr = String::from("Server");
 
-
-    let connections = Rc::new(RefCell::new(HashMap::new()));
     let (server_handle, rx) = mpsc::unbounded();
-    connections.borrow_mut().insert(server_addr.clone(), server_handle);
-    let server = Server::new(connections.clone(), rx);
+    let server = Server::new(rx);
 
-    let conn_handler = ConnectionHandler::new(handle.clone(), connections.clone(), server_addr.clone());
+    let conn_handler = ConnectionHandler::new(handle.clone(), server_handle);
 
     let done = socket.incoming().for_each(|(stream, addr)| {
         conn_handler.new_connection(stream, addr);
@@ -64,6 +60,9 @@ fn main() {
 
     let serialized = serde_json::to_string(&event).unwrap();
     println!("serialized: {}", serialized);
+
+    let get = Get::User{user: "me".to_string()};
+    println!("get: {}", serde_json::to_string(&get).unwrap());
 
     // let other_me_group: Group = serde_json::from_str(&serialized).unwrap();
 
