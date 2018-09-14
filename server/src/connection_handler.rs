@@ -11,8 +11,9 @@ use futures::sync::mpsc;
 use futures::{Future, Poll, Stream};
 
 use tokio_core::net::{TcpStream};
+use core::time::Duration;
 
-use tokio_core::reactor::Handle;
+use tokio_core::reactor::{Handle, Timeout};
 use tokio_io::io;
 use tokio_io::AsyncRead;
 use tokio::io::ReadHalf;
@@ -33,7 +34,7 @@ impl ConnectionHandler {
         }
     }
 
-    pub fn new_connection(&self, stream: TcpStream, _addr: SocketAddr) {
+    pub fn new_connection(&self, stream: TcpStream) {
         use tokio_io::AsyncRead;
 
         let (reader, writer) = stream.split();
@@ -52,12 +53,18 @@ impl ConnectionHandler {
             amt.map_err(|_| ())
         });
 
-        let socket_reader = conn;
-        let connection = socket_reader.select(socket_writer.then(|_| Ok(())));
+        let connection = conn.select(socket_writer.then(|_| Ok(println!("writer stopped"))));
 
         self.handle.spawn(connection.then(|_| Ok(())));
-    }
 
+        // test to check what would happen if server wants to disconnect someone
+        let sh = self.server_handle.clone();
+
+        self.handle.spawn(Timeout::new(Duration::new(10,0), &self.handle).unwrap().then(move |_| {
+            sh.unbounded_send((ServerEvent::Disconnect, "hi".to_string())).unwrap();
+            Ok(println!("timeoute occured"))
+        }));
+    }
 }
 
 enum State {

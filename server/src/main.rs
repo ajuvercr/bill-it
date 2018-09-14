@@ -11,6 +11,8 @@ extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
 
+extern crate core;
+
 use std::env;
 use std::net::SocketAddr;
 use std::collections::HashMap;
@@ -50,8 +52,8 @@ fn main() {
 
     let conn_handler = ConnectionHandler::new(handle.clone(), server_handle);
 
-    let done = socket.incoming().for_each(|(stream, addr)| {
-        conn_handler.new_connection(stream, addr);
+    let done = socket.incoming().for_each(|(stream, _addr)| {
+        conn_handler.new_connection(stream);
         Ok(())
     });
 
