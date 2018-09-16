@@ -23,11 +23,11 @@
     <string name="crop_message">Snij de afbeelding bij zodat enkel de artikels en hun prijs overblijven (De totale prijs mag er niet bij).</string>
     <string name="capture_message">Om te verzekeren dat de gewenste text herkend wordt, gelieve te wachten tot kaders rond de text getekend worden. Het is mogelijk dat de autofocus niet goed werkt. Wanneer dit gebeurt, probeer de camera te verwijderen van het ticket en breng deze er dan traag weer naartoe. Als dit ook niet werkt, probeer dan het toestel te draaien naar landscape modus.</string>
     <string name="tutorials">Handleidingen</string>
-    <string name="crop_tutorial_title" translatable="false">Afbeelding bijsnijden</string>
+    <string name="crop_tutorial_title">Afbeelding bijsnijden</string>
     <string name="capture_tutorial_title">Foto nemen</string>
     <string name="welcome_tutotial_title">Welkom</string>
     <string name="welcome_message">Welkom bij Bill-it. Als dit je eerste keer hier is, zul je hulpschermen zoals deze zien verschijnen. Je kan deze uitzetten door op het selectievakje te klikken. Als je deze schermen laten weer wil aanzetten, kan u dit doen via de instellingen.</string>
-    <string name="settings" translatable="false">Instellingen</string>
+    <string name="settings">Instellingen</string>
     <string name="avatar_description">Avatar van een vriend</string>
     <string name="send">Stuur naar iedereen</string>
     <string name="title_add_friend">Voeg vriend toe</string>

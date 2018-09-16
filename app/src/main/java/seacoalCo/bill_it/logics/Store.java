@@ -8,17 +8,18 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 
 import seacoalCo.bill_it.logics.group.Group;
 import seacoalCo.bill_it.logics.user.User;
+
 
 /// This is used to communicate between firebase db, local files etc
 /// It has an internal state of groups and users so it doesn't have to fetch everything
@@ -46,7 +48,16 @@ public class Store {
     private static HashMap<String, User> users;
     private static Deque<Runnable> whenInternet;
     private static Context context;
-    private static FirebaseFirestore db;
+
+    private static final String ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    public static String randomAlphaNumeric(int count) {
+        StringBuilder builder = new StringBuilder();
+        while (count-- != 0) {
+            int character = (int)(Math.random()*ALPHA_NUMERIC_STRING.length());
+            builder.append(ALPHA_NUMERIC_STRING.charAt(character));
+        }
+        return builder.toString();
+    }
 
     static {
         groups = new HashMap<>();
@@ -61,7 +72,29 @@ public class Store {
         fs.mkdir();
         fs = new File(f, "groups");
         fs.mkdir();
-        db = FirebaseFirestore.getInstance();
+
+        PrintWriter out = null;
+        BufferedReader in = null;
+
+        try{
+            Socket socket = new Socket("127.0.0.0", 8080);
+            out = new PrintWriter(socket.getOutputStream(),
+                    true);
+            in = new BufferedReader(new InputStreamReader(
+                    socket.getInputStream()));
+        } catch (UnknownHostException e) {
+            System.out.println("Unknown host: kq6py");
+            System.exit(1);
+        } catch  (IOException e) {
+            System.out.println("No I/O");
+            System.exit(1);
+        }
+
+        Log.d("USSR", "Hello there");
+
+        if(out != null) {
+            out.println("it's me");
+        }
     }
 
     // use with caution
@@ -117,7 +150,7 @@ public class Store {
         // start task to save offline
         new SaveOffline((f, v) -> Log.d("USSR", "Offline save: "+f), obj).execute(obj.collection(), obj.getId());
         // start task to save online
-        new SaveOnline((f, v) -> Log.d("USSR", "Online save: "+f), obj).execute(obj.collection(), obj.getId());
+        //new SaveOnline((f, v) -> Log.d("USSR", "Online save: "+f), obj).execute(obj.collection(), obj.getId());
     }
 
     public interface Callback<T> {
@@ -125,8 +158,9 @@ public class Store {
     }
 
     private static boolean isConnected() {
-        NetworkInfo ni = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-        return ni != null && ni.isConnected();
+        return false;
+        //NetworkInfo ni = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        //return ni != null && ni.isConnected();
     }
 
     private static abstract class MyTask<T> extends AsyncTask<String, Void, T> {
@@ -168,7 +202,7 @@ public class Store {
             this.cb = cb;
 
             tasks.add(new LoadOffline<>(this));
-            tasks.add(new LoadOnline<T>(this, t));
+            //tasks.add(new LoadOnline<T>(this, t));
 
             tasks.forEach(ta -> ta.execute(params));
         }
@@ -239,19 +273,8 @@ public class Store {
 
         @Override
         protected T doInBackground(String... strings) {
-            T out = null;
-            if(isConnected()) {
-                Task<DocumentSnapshot> t = db.collection(strings[0]).document(strings[1]).get();
-                t.addOnCompleteListener((e) -> {
-                    T obj = e.getResult().toObject(type);
-                    c.call(obj != null, obj);
-                });
-                t.addOnCanceledListener(() -> c.call(false, null));
-                t.addOnFailureListener((e) -> c.call(false, null));
-//                t.addOnSuccessListener((DocumentSnapshot d) -> c.call(true, d.toObject(type)));
-            }else{
-                c.call(false, null);
-            }
+            c.call(false, null);
+
             return null;
         }
     }
@@ -292,16 +315,6 @@ public class Store {
 
         @Override
         protected Void doInBackground(String... strings) {
-            if (isConnected()) {
-                try {
-                    db
-                            .collection(strings[0])
-                            .document(strings[1])
-                            .set(o);
-                }catch (Exception e) {
-                    // do nothing
-                }
-            }
             return null;
         }
     }

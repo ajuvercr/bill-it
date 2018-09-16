@@ -23,11 +23,11 @@
     <string name="crop_message">Crop the image so only the items  and their price remain  (don\'t include the total price)</string>
     <string name="capture_message">To ensure the desired text is recognised, please wait until boxes appear             around the text. It is possible that the autofocus isn\'t working properly. If this occurs             try moving the camera away from the ticket and slowly come closer again. If this doesn\'t work             either try rotating your device (to landscape mode).</string>
     <string name="tutorials">Tutorials</string>
-    <string name="crop_tutorial_title" translatable="false">Image cropping</string>
+    <string name="crop_tutorial_title">Image cropping</string>
     <string name="capture_tutorial_title">Image capturing</string>
     <string name="welcome_tutotial_title">Welcome</string>
     <string name="welcome_message">Welcome to Bill-It! If this is your first time, you might be             seeing tutorial windows like this pop up. You can disable them by clicking the checkbox.             If you would like to re-enable them later, you can do so in the settings.</string>
-    <string name="settings" translatable="false">Settings</string>
+    <string name="settings">Settings</string>
     <string name="avatar_description">Avatar of a Friend</string>
     <string name="send">Send to all</string>
     <string name="title_add_friend">Add friend</string>

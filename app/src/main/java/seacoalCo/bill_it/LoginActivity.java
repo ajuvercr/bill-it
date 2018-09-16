@@ -11,16 +11,12 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
-
 import seacoalCo.bill_it.logics.Store;
 import seacoalCo.bill_it.logics.user.User;
 import seacoalCo.bill_it.utility_classes.TutorialBuilder;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private FirebaseAuth auth;
     private boolean backToButtons = false;
     private boolean working = false;
 
@@ -30,17 +26,23 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        FirebaseApp.initializeApp(this);
-        auth = FirebaseAuth.getInstance();
+        //FirebaseApp.initializeApp(this);
+        //auth = FirebaseAuth.getInstance();
 
         // initialize settings
-        Store.init(
-                getApplication()
-        );
+        Thread t = new Thread(() -> Store.init(getApplication()));
+        t.start();
+        //Store.init(
+          //      getApplication()
+        //);
+
+        // shouldnt be here
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        // no defaults let the user log in (not on server though, not there yet
+        // TODO login with server
         if (sharedPreferences.getString(getString(R.string.user_id), " ").equals(" ")) {
             loadButtons();
 
@@ -50,15 +52,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
         else {
-            if(auth.getCurrentUser() == null) {
-                Log.d("USSR", "Not logged in");
-                auth.signInWithEmailAndPassword(sharedPreferences.getString(getString(R.string.email), " "),
-                        sharedPreferences.getString(getString(R.string.password), " "))
-                        .addOnSuccessListener((e) -> loggedIn()).addOnFailureListener((e) -> loadButtons())
-                        .addOnCanceledListener(() -> loadButtons());
-            }else{
                 loggedIn();
-            }
         }
     }
 
@@ -91,12 +85,14 @@ public class LoginActivity extends AppCompatActivity {
     public void loggedIn() {
         //As long as the e-mail address hasn't been confirmed
         // the user won't be able to login
-        if(!auth.getCurrentUser().isEmailVerified()){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String id = sharedPreferences.getString(getString(R.string.user_id), "");
+        if(id == ""){
+            Log.d("USSR", "Not logged in, i don't know what i'm doing");
             loadLog();
         }else{
+
             // blocking to get current user
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            String id = sharedPreferences.getString(getString(R.string.user_id), "");
             Log.d("USSR", "Log in id: "+id);
             Store.getUser(id, new Starter(
                     sharedPreferences.getString(LoginActivity.this.getString(R.string.email), ""),
@@ -130,12 +126,12 @@ public class LoginActivity extends AppCompatActivity {
                     );
             }
 
-            String mail = auth.getCurrentUser().getEmail();
+            /*String mail = auth.getCurrentUser().getEmail();
             if (!mail.equals(User.getLoggedInUser().getEmail())) {
                 User user = User.getLoggedInUser();
                 user.setEmail(mail);
                 Store.save(user);
-            }
+            }*/
 
             if (!started) {
                 started = true;

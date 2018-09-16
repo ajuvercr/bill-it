@@ -6,8 +6,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 
-import com.google.firebase.auth.FirebaseUser;
-
 import seacoalCo.bill_it.LoginActivity;
 import seacoalCo.bill_it.R;
 import seacoalCo.bill_it.logics.Store;
@@ -38,16 +36,11 @@ public class ValidatingMailPreference extends ValidatingEditTextPreference{
 
     @Override
     protected void onConfirm(String value) {
-        FirebaseUser fUser = auth.getCurrentUser();
-
-        fUser.updateEmail(value);
-        fUser.sendEmailVerification();
 
         User user = User.getLoggedInUser();
         user.setEmail(value);
         Store.save(user);
 
-        auth.signOut();
         Context c = getContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(c);
         SharedPreferences.Editor editor = preferences.edit();

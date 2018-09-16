@@ -49,6 +49,9 @@ public class User implements Savable {
     protected List<String> friends, groups;
 
     public User(String name, String email, String id) {
+        if (id == null) {
+            id = Store.randomAlphaNumeric(10);
+        }
         this.name = name;
         this.email = email;
         this.friends = new ArrayList<>();

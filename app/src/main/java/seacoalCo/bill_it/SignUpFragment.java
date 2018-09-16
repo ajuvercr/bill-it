@@ -12,11 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.firestore.FirebaseFirestore;
-
 import seacoalCo.bill_it.logics.user.User;
 import seacoalCo.bill_it.utility_classes.FieldValidator;
 
@@ -27,8 +22,6 @@ public class SignUpFragment extends Fragment {
     EditText passField;
     EditText confPassField;
     Button logButton;
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-    FirebaseAuth auth = FirebaseAuth.getInstance();
 
     public SignUpFragment() {
         // Required empty public constructor
@@ -93,7 +86,16 @@ public class SignUpFragment extends Fragment {
 
         if (noErrors) {
 
-            auth.createUserWithEmailAndPassword(email, pass)
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString(getString(R.string.user_name), nameField.getText().toString());
+            editor.putString(getString(R.string.email), mailField.getText().toString());
+            editor.putString(getString(R.string.password), pass);
+
+            User user = new User(nameField.getText().toString(), mailField.getText().toString(), null);
+
+
+            /*auth.createUserWithEmailAndPassword(email, pass)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
@@ -127,7 +129,7 @@ public class SignUpFragment extends Fragment {
                             Toast.makeText(getContext(), "E-mail already registered",
                                     Toast.LENGTH_SHORT).show();
                         }
-                    });
+                    });*/
         }
     }
 }

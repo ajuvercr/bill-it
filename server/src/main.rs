@@ -15,13 +15,9 @@ extern crate core;
 
 use std::env;
 use std::net::SocketAddr;
-use std::collections::HashMap;
-use std::cell::RefCell;
-use std::rc::Rc;
 
 use futures::stream::{Stream};
 use futures::sync::mpsc;
-
 
 use tokio_core::net::{TcpListener};
 use tokio_core::reactor::Core;

@@ -8,13 +8,7 @@ import android.preference.EditTextPreference;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
-
 public abstract class ValidatingEditTextPreference extends EditTextPreference {
-
-    FirebaseAuth auth = FirebaseAuth.getInstance();
 
     ValidatingEditTextPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);

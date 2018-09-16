@@ -15,8 +15,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.firebase.auth.FirebaseAuth;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -136,7 +134,6 @@ public class MainDrawerActivity extends AppCompatActivity implements Friends.OnF
                     this.startActivity(settingsIntent);
                     break;
                 case R.id.logout:
-                    FirebaseAuth.getInstance().signOut();
                     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putString(getString(R.string.user_name), " ");

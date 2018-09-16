@@ -16,8 +16,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-
 import seacoalCo.bill_it.R;
 import seacoalCo.bill_it.logics.Store;
 import seacoalCo.bill_it.logics.user.User;
@@ -30,7 +28,6 @@ public class AddFriend extends AppCompatActivity {
     private EditText idField;
 
     private SharedPreferences preferences;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
