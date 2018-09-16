@@ -77,17 +77,17 @@ public class Store {
         BufferedReader in = null;
 
         try{
-            Socket socket = new Socket("127.0.0.0", 8080);
+            Socket socket = new Socket("10.0.2.2", 8080);
             out = new PrintWriter(socket.getOutputStream(),
                     true);
             in = new BufferedReader(new InputStreamReader(
                     socket.getInputStream()));
         } catch (UnknownHostException e) {
-            System.out.println("Unknown host: kq6py");
-            System.exit(1);
+            Log.d("USSR", "couldn't connect");
+            Log.d("USSR", e.getMessage());
         } catch  (IOException e) {
-            System.out.println("No I/O");
-            System.exit(1);
+            Log.d("USSR", "No I/O");
+            Log.d("USSR", e.getMessage());
         }
 
         Log.d("USSR", "Hello there");
