@@ -2,6 +2,8 @@ package seacoalCo.bill_it.logics.group;
 
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,6 +36,10 @@ public class Group implements Savable {
         userIds = new ArrayList<>();
         items = new ArrayList<>();
         expenses = new LinkedList<>();
+    }
+
+    public Group(JSONObject obj) {
+
     }
 
     public void addUser(String userId) {

@@ -5,8 +5,13 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,12 +48,7 @@ import seacoalCo.bill_it.logics.user.User;
 /// whenInternet has all things that need to be done when there is internet
 ///
 /// Only send callback with succes == false when there is no way to get the requested data
-public class Store {
-    private static HashMap<String, Group> groups;
-    private static HashMap<String, User> users;
-    private static Deque<Runnable> whenInternet;
-    private static Context context;
-
+public class Store implements Runnable {
     private static final String ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     public static String randomAlphaNumeric(int count) {
         StringBuilder builder = new StringBuilder();
@@ -59,23 +59,44 @@ public class Store {
         return builder.toString();
     }
 
-    static {
+    private static Store store;
+
+    public static final String GROUPSFOLDER = "groups";
+    public static final String USERSFOLDER = "users";
+
+    private HashMap<String, Group> groups;
+    private HashMap<String, User> users;
+    private Deque<Runnable> whenInternet;
+    private Context context;
+    private PrintWriter out = null;
+    private BufferedReader in = null;
+
+    private Handler uiHandler;
+
+    public static void init(Context c, Handler h) {
+        if(store == null)
+            store = new Store(c, h);
+    }
+
+    public static Store getInstance() {
+        return store;
+    }
+
+    private Store(Context c, Handler handler) {
         groups = new HashMap<>();
         users = new HashMap<>();
         whenInternet = new ArrayDeque<>();
-    }
-
-    public static void init(Context c) {
         context = c;
+        uiHandler = handler;
+
         File f = context.getFilesDir();
         File fs = new File(f, "users");
         fs.mkdir();
         fs = new File(f, "groups");
         fs.mkdir();
+    }
 
-        PrintWriter out = null;
-        BufferedReader in = null;
-
+    private void connect() {
         try{
             Socket socket = new Socket("10.0.2.2", 8080);
             out = new PrintWriter(socket.getOutputStream(),
@@ -89,23 +110,24 @@ public class Store {
             Log.d("USSR", "No I/O");
             Log.d("USSR", e.getMessage());
         }
-
-        Log.d("USSR", "Hello there");
-
-        if(out != null) {
-            out.println("it's me");
-        }
     }
 
-    // use with caution
-    // saves ALL instate
-    public static void saveAll() {
+    private void saveAllInstance() {
         for(Group g : groups.values()) {
             save(g);
         }
         for(User u : users.values()) {
             save(u);
         }
+    }
+
+    // use with caution
+    // saves ALL instate
+    public static void saveAll() {
+        if(store == null) {
+            throw new RuntimeException("STORE NOT INITIATED, PLEASE CALL STORE.INIT FIRST");
+        }
+        store.saveAllInstance();
     }
 
     private static String getPath(String... fileNames) {
@@ -121,7 +143,7 @@ public class Store {
     }
 
     public static void getUser(String userId, Callback<User> cb) {
-        new LoadRacer<User>(cb, users, User.class, "users", userId);
+        new LoadRacer<User>(cb, users, User.class, USERSFOLDER, userId);
     }
 
     public static Group getInStateGroup(String groupId) {
@@ -143,7 +165,7 @@ public class Store {
     }
 
     public static void getGroup(String groupId, Callback<Group> cb) {
-        new LoadRacer<Group>(cb, groups, Group.class,"groups",  groupId);
+        new LoadRacer<Group>(cb, groups, Group.class,GROUPSFOLDER,  groupId);
     }
 
     public static void save(Savable obj) {
@@ -151,6 +173,36 @@ public class Store {
         new SaveOffline((f, v) -> Log.d("USSR", "Offline save: "+f), obj).execute(obj.collection(), obj.getId());
         // start task to save online
         //new SaveOnline((f, v) -> Log.d("USSR", "Online save: "+f), obj).execute(obj.collection(), obj.getId());
+    }
+
+    @Override
+    public void run() {
+        while(true) { // perfect programming style ofcourse
+            connect();
+
+            try {
+                while(true) {
+                    String line = in.readLine();
+                    JSONObject obj = new JSONObject(line);
+                    switch (obj.getString("type")) {
+                        case "user":
+                            User u = new User(obj);
+                            users.put(u.getId(), u);
+                            break;
+                        case "group":
+                            Group g = new Group(obj);
+                            groups.put(g.getId(), g);
+                            break;
+                    }
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     public interface Callback<T> {

@@ -1,5 +1,9 @@
 package seacoalCo.bill_it.logics.user;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +63,23 @@ public class User implements Savable {
         this.groups = new ArrayList<>();
         this.id = id;
         Store.save(this);
+    }
+
+    public User(JSONObject obj) throws JSONException {
+        name = obj.getString("name");
+        email = obj.getString("email");
+
+        JSONArray fs = obj.getJSONArray("friends");
+        friends = new ArrayList<>();
+        for (int i = 0; i < fs.length(); i++) {
+            friends.add( fs.getString(i));
+        }
+
+        JSONArray gs = obj.getJSONArray("groups");
+        groups = new ArrayList<>();
+        for (int i = 0; i < gs.length(); i++) {
+            groups.add( gs.getString(i));
+        }
     }
 
     public User() {
